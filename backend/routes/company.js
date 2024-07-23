@@ -20,9 +20,47 @@ router.get("/", async (req, res) => {
 
 // Get company details
 router.get("/:id", async (req, res) => {
+  console.log(req.params.id, "update");
   const company = await Company.findById(req.params.id);
   if (!company) return res.status(404).json({ message: "Company not found" });
   res.json(company);
+});
+
+// Update company
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, address, contactEmail } = req.body;
+    const updatedCompany = await Company.findByIdAndUpdate(
+      req.params.id,
+      { name, address, contactEmail },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedCompany) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    res.json(updatedCompany);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Delete company
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedCompany = await Company.findByIdAndDelete(req.params.id);
+
+    if (!deletedCompany) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    res.json({ message: "Company deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 module.exports = router;
